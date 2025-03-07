@@ -236,7 +236,11 @@ trait HasPermissions
 
         $permission = $this->filterPermission($permission, $guardName);
 
-        return $this->hasDirectPermission($permission) || $this->hasPermissionViaRole($permission);
+        $is = $this->hasDirectPermission($permission) || $this->hasPermissionViaRole($permission);
+
+        unset($permission->roles);
+
+        return $is;
     }
 
     /**
