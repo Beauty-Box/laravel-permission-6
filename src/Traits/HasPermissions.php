@@ -2,6 +2,8 @@
 
 namespace Spatie\Permission\Traits;
 
+use Beauty\Modules\Auth\Controllers\ApiController;
+use Beauty\Modules\Common\Models\Role as RoleBeauty;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Arr;
@@ -193,6 +195,22 @@ trait HasPermissions
 
         if (! $permission instanceof Permission) {
             throw new PermissionDoesNotExist;
+        }
+
+        $base = resolve(ApiController::class);
+        $oProfile = $base->getProfile($this);
+        if (
+            $this->getRoleNames()->first() === RoleBeauty::CLIENT ||
+            $this->getRoleNames()->first() === RoleBeauty::MASTER ||
+            $this->getRoleNames()->first() === RoleBeauty::SITE_ADMIN
+        ) {
+            $permission->load(['roles' => function ($query) use ($oProfile) {
+                $query->whereIn('name', [RoleBeauty::CLIENT,RoleBeauty::MASTER,RoleBeauty::SITE_ADMIN]);
+            }])->get();
+        } else {
+            $permission->load(['roles' => function ($query) use ($oProfile) {
+                $query->where('profileID', $oProfile->profileID);
+            }])->get();
         }
 
         return $permission;
