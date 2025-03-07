@@ -9,6 +9,7 @@ use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\PermissionsTeamResolver;
 use Spatie\Permission\Contracts\Role;
@@ -212,7 +213,9 @@ class PermissionRegistrar
      */
     public function getPermissions(array $params = [], bool $onlyOne = false): Collection
     {
-        $this->loadPermissions();
+        if ($this->permissions === null) {
+            $this->permissions = $this->getPermissionClass()->get();
+        }
 
         $method = $onlyOne ? 'first' : 'filter';
 
