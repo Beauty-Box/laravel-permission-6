@@ -214,7 +214,7 @@ class PermissionRegistrar
     public function getPermissions(array $params = [], bool $onlyOne = false): Collection
     {
         if ($this->permissions === null) {
-            $this->permissions = $this->getPermissionClass()->get();
+            $this->permissions = $this->getAppPermissionClass()->get();
         }
 
         $method = $onlyOne ? 'first' : 'filter';
@@ -239,6 +239,15 @@ class PermissionRegistrar
     public function getPermissionClass(): string
     {
         return $this->permissionClass;
+    }
+    /**
+     * Get an instance of the permission class.
+     *
+     * @return \Spatie\Permission\Contracts\Permission
+     */
+    public function getAppPermissionClass(): Permission
+    {
+        return app($this->permissionClass);
     }
 
     public function setPermissionClass($permissionClass)
